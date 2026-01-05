@@ -33,7 +33,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
      * WHERE user_id = ?
      * ORDER BY transaction_date DESC
      */
-    List<Transaction> findByUserIdOrderByTransactionDateDesc(
+    List<Transaction> findByUserIdOrderByCreatedAtDesc(
             Long userId
     );
 

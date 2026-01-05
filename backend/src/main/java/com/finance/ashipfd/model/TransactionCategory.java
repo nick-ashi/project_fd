@@ -1,4 +1,5 @@
 package com.finance.ashipfd.model;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum TransactionCategory {
     // Income Categories
@@ -62,8 +63,15 @@ public enum TransactionCategory {
         return displayName;
     }
 
+    @JsonValue
+    public String toValue() {
+        return this.name();
+    }
+
     @Override
     public String toString() {
         return displayName;
     }
+
+
 }

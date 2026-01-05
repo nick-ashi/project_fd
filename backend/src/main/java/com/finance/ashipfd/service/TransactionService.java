@@ -80,7 +80,7 @@ public class TransactionService {
     public List<TransactionResponse>
     getAllUserTransactions(Long userId) {
         List<Transaction> transactions =
-                transactionRepository.findByUserIdOrderByTransactionDateDesc(userId);
+                transactionRepository.findByUserIdOrderByCreatedAtDesc(userId);
 
         // Convert list of entities → list of DTOs
         return transactions.stream()

@@ -37,6 +37,9 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(nullable = true)
+    private Long monthlyBudget
+
     @PrePersist
     public void onCreate() {
         createdAt = LocalDateTime.now();

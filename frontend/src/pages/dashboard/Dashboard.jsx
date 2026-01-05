@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GrUpdate } from "react-icons/gr";
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
+import TransactionModal from '../transactionEditor/TransactionModal';
+import {RiEditBoxFill} from "react-icons/ri";
+import {FaTrashCan} from "react-icons/fa6";
+import {MdCreditScore} from "react-icons/md";
 
 /**
  * DASHBOARD PAGE
@@ -18,11 +23,13 @@ export default function Dashboard() {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingTransaction, setEditingTransaction] = useState(null);
 
     const { user, logout } = useAuth();
     const nav = useNavigate();
 
-    const chooseRandomMsg = () => {
+    const [randomMsg] = useState( () => {
         const msgs = [
             "Track your finances and reach your goals faster",
             "Every dollar saved is a dollar earned !",
@@ -36,7 +43,7 @@ export default function Dashboard() {
             "Turning dreams into financial plans",
         ]
         return msgs[Math.floor(Math.random() * msgs.length)];
-    }
+    });
 
     const handleLogout = async () => {
         await logout();
@@ -47,7 +54,9 @@ export default function Dashboard() {
     const formatDate = (dateStr) => {
         if (!dateStr) return 'N/A';
 
-        const date = new Date(dateStr);
+        const [year, month, day] = dateStr.split('-');
+        // who made months zero indexed?????
+        const date = new Date(year, month - 1, day);
         if (isNaN(date.getTime())) return dateStr;
 
         return date.toLocaleDateString('en-US', {
@@ -61,6 +70,63 @@ export default function Dashboard() {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'USD' }).format(amount);
+    };
+
+    const formatCategoryName = (category) => {
+        const categoryMap = {
+            // Income
+            'SALARY': 'Salary',
+            'BUSINESS_INCOME': 'Business Income',
+            'INVESTMENT_RETURNS': 'Investment Returns',
+            'RENTAL_INCOME': 'Rental Income',
+            'GIFTS_RECEIVED': 'Gifts Received',
+            'TAX_REFUND': 'Tax Refund',
+            'BONUS': 'Bonus',
+            'SIDE_HUSTLE': 'Side Hustle',
+            'OTHER_INCOME': 'Other Income',
+
+            // Essential Expenses
+            'RENT_MORTGAGE': 'Rent/Mortgage',
+            'UTILITIES': 'Utilities',
+            'GROCERIES': 'Groceries',
+            'TRANSPORTATION': 'Transportation',
+            'GAS': 'Gas/Fuel',
+            'INSURANCE': 'Insurance',
+            'PHONE_INTERNET': 'Phone & Internet',
+            'HEALTHCARE': 'Healthcare',
+            'DEBT_PAYMENTS': 'Debt Payments',
+
+            // Lifestyle
+            'DINING_OUT': 'Dining Out',
+            'DELIVERY': 'Delivery',
+            'ENTERTAINMENT': 'Entertainment',
+            'SHOPPING': 'Shopping',
+            'SUBSCRIPTIONS': 'Subscriptions',
+            'GYM_FITNESS': 'Gym & Fitness',
+            'TRAVEL': 'Travel',
+            'HOBBIES': 'Hobbies',
+            'PERSONAL_CARE': 'Personal Care',
+            'GIFTS_GIVEN': 'Gifts Given',
+
+            // Financial
+            'SAVINGS': 'Savings',
+            'INVESTMENTS': 'Investments',
+            'EMERGENCY_FUND': 'Emergency Fund',
+            'RETIREMENT': 'Retirement',
+            'TAXES': 'Taxes',
+            'BANK_FEES': 'Bank Fees',
+
+            // Miscellaneous
+            'EDUCATION': 'Education',
+            'CHARITY': 'Charity/Donations',
+            'PET_EXPENSES': 'Pet Expenses',
+            'HOME_IMPROVEMENT': 'Home Improvement',
+            'CLOTHING': 'Clothing',
+            'BOOKS_MEDIA': 'Books & Media',
+            'OTHER_EXPENSE': 'Other Expense',
+        };
+
+        return categoryMap[category] || category;
     };
 
     // Fetch transactions when the component mounts
@@ -81,6 +147,41 @@ export default function Dashboard() {
         }
     }
 
+    // Add transaction functionality
+    const handleCreateTransaction = async (formData) => {
+        try {
+            await api.post('/transactions', formData);
+            setIsModalOpen(false);
+            fetchTransactions(); // Refresh the list
+        } catch (err) {
+            console.error('Failed to create transaction:', err);
+            setError('Failed to create transaction');
+        }
+    };
+
+    // Update transaction functionality
+    const handleUpdateTransaction = async (formData) => {
+        try {
+            await api.put(`/transactions/${editingTransaction.id}`, formData);
+            setIsModalOpen(false);
+            setEditingTransaction(null);
+            fetchTransactions(); // Refresh the list
+        } catch (err) {
+            console.error('Failed to update transaction:', err);
+            setError('Failed to update transaction');
+        }
+    };
+
+    const handleDeleteTransaction = async (id) => {
+        try {
+            await api.delete(`/transactions/${id}`);
+            fetchTransactions();
+        } catch (err) {
+            console.error('Failed to delete transaction:', err);
+            setError('Failed to delete transaction');
+        }
+    };
+
     return (
         <div className="min-h-screen bg-matcha-dark">
             {/* Header */}
@@ -91,24 +192,47 @@ export default function Dashboard() {
                             Welcome back, {user?.firstName}!
                         </h1>
                         <p className="text-gray-600 mt-1">
-                            { chooseRandomMsg() }
+                            { randomMsg }
                         </p>
                     </div>
                     <button
                         onClick={handleLogout}
-                        className="px-4 py-2 bg-matcha-light hover:bg-matcha text-white rounded-md font-medium"
+                        className="px-4 py-2 bg-matcha-light transform transition-all duration-600 hover:bg-matcha text-white rounded-md font-medium"
                     >
                         Logout
                     </button>
                 </div>
             </div>
 
-            {/* Main Content */}
+            {/* Transaction List */}
             <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
                 <div className="bg-matcha-cream rounded-lg shadow p-6">
-                    <h2 className="text-2xl font-bold text-matcha-darker mb-6">
-                        Your Transactions
-                    </h2>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-matcha-darker mb-6">
+                            Your Transactions
+                        </h2>
+                        <div className="flex justify-between items-center space-x-1 mb-6">
+                            <button
+                            onClick={() => {
+                                setEditingTransaction(null);
+                                setIsModalOpen(true);
+                            }}
+                            className="px-3 py-2 bg-matcha-light hover:bg-matcha transform transition-all duration-600 text-white rounded-md font-medium"
+                            >
+                                <div className="flex items-center justify-between space-x-1">
+                                    <div>
+                                        New
+                                    </div>
+                                    <div>
+                                        <MdCreditScore className="text-xl"/>
+                                    </div>
+                                </div>
+                            </button>
+
+
+                        </div>
+
+                    </div>
 
                     {/* Loading State */}
                     {loading && (
@@ -154,6 +278,9 @@ export default function Dashboard() {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                         Amount
                                     </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        OPTIONS
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
@@ -166,7 +293,7 @@ export default function Dashboard() {
                                             {transaction.description}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {transaction.category}
+                                            {formatCategoryName(transaction.category)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -185,7 +312,28 @@ export default function Dashboard() {
                                             {transaction.type === 'INCOME' ? '+' : '-'}
                                             {formatCurrency(transaction.amount)}
                                         </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-1">
+                                            <button
+                                                onClick={() => {
+                                                    setIsModalOpen(true);
+                                                    setEditingTransaction(transaction);
+                                                }}
+                                                className="px-4 py-2 bg-matcha-light hover:bg-matcha transform transition-all duration-600 text-white rounded-md font-medium "
+                                            >
+                                                <RiEditBoxFill />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    handleDeleteTransaction(transaction.id);
+                                                }}
+                                                className="px-4 py-2 bg-matcha-light hover:bg-matcha transform transition-all duration-600 text-white rounded-md font-medium "
+                                            >
+                                                <FaTrashCan />
+                                            </button>
+                                        </td>
+
                                     </tr>
+
                                 ))}
                                 </tbody>
                             </table>
@@ -193,6 +341,15 @@ export default function Dashboard() {
                     )}
                 </div>
             </div>
+            <TransactionModal
+                isOpen={isModalOpen}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setEditingTransaction(null);
+                }}
+                onSave={editingTransaction ? handleUpdateTransaction : handleCreateTransaction}
+                transaction={editingTransaction}
+            />
         </div>
     );
 }

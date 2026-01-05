@@ -1,0 +1,146 @@
+# ===================================
+# Spring Boot / Java / Maven
+# ===================================
+
+# Application properties (contains sensitive DB credentials)
+**/application.properties
+**/application-*.properties
+**/application.yml
+**/application.yaml
+**/application-*.yml
+**/application-*.yaml
+
+# Other config files that might contain secrets
+**/secrets.properties
+**/database.properties
+credentials.json
+config.json
+
+# Security keys and certificates
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+*.truststore
+*.cer
+*.crt
+*.der
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Compiled class files
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Log files
+*.log
+logs/
+
+# ===================================
+# Node.js / React / Vite
+# ===================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+dist/
+dist-ssr/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ===================================
+# IDE / Editor
+# ===================================
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# ===================================
+# Operating System
+# ===================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# ===================================
+# Database
+# ===================================
+
+# PostgreSQL
+*.sql
+*.db
+*.sqlite
+*.sqlite3
+
+# ===================================
+# Other
+# ===================================
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Package files
+*.tgz
+
+# Test coverage
+coverage/
+*.lcov
+.nyc_output/

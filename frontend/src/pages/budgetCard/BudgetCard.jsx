@@ -12,8 +12,7 @@ import api from '../../api/axios';
  *
  *  TODO:
  *  [] Make sub budgets (maybe in an expanded view option?)
- *  [] Set budgets for upcoming months, be able to look back at previous months
- *  []
+ *  [X] Set budgets for upcoming months, be able to look back at previous months
  */
 export default function BudgetCard({ transactions }) {
     const [budget, setBudget] = useState(null);
@@ -24,21 +23,27 @@ export default function BudgetCard({ transactions }) {
 
     // Get current month and year
     const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1; // 0-indexed, so add 1
-    const currentYear = currentDate.getFullYear();
+    const actualCurrentMonth = currentDate.getMonth() + 1; // 0-indexed, so add 1
+    const actualCurrentYear = currentDate.getFullYear();
 
-    // Calculate total expenses for current month
+    // Viewing months
+    const [viewingMonth, setViewingMonth] = useState(actualCurrentMonth);
+    const [viewingYear, setViewingYear] = useState(actualCurrentYear);
+
+    const isViewingCurrentMonth = viewingMonth === actualCurrentMonth && viewingYear === actualCurrentYear;
+
+    // Calculate total expenses for curr month
     const calculateMonthlyExpenses = () => {
         return transactions
             .filter(t => {
-                // Only count EXPENSE transactions from current month
+                // Only count EXPENSE transactions from curr month
                 if (t.type !== 'EXPENSE') return false;
 
                 const [year, month, day] = t.transactionDate.split("-");
                 const transDate = new Date(year, month - 1, day);
 
-                return transDate.getMonth() + 1 === currentMonth &&
-                    transDate.getFullYear() === currentYear;
+                return transDate.getMonth() + 1 === viewingMonth &&
+                    transDate.getFullYear() === viewingYear;
             })
             .reduce((sum, t) => sum + parseFloat(t.amount), 0);
     };
@@ -48,17 +53,17 @@ export default function BudgetCard({ transactions }) {
     // Fetch budget on component looads
     useEffect(() => {
         fetchBudget();
-    }, []);
+    }, [viewingMonth, viewingYear]);
 
     const fetchBudget = async () => {
         try {
             setLoading(true);
-            const res = await api.get(`/budgets?month=${currentMonth}&year=${currentYear}`);
+            const res = await api.get(`/budgets?month=${viewingMonth}&year=${viewingYear}`);
             setBudget(res.data);
             setBudgetAmount(res.data?.amount || '');
         } catch (err) {
             if (err.response?.status === 204) {
-                // No budget set - this is fine
+                // No budget set - this is fine...
                 setBudget(null);
             } else {
                 console.error('Failed to fetch budget:', err);
@@ -78,8 +83,8 @@ export default function BudgetCard({ transactions }) {
             }
 
             await api.put('/budgets', {
-                month: currentMonth,
-                year: currentYear,
+                month: viewingMonth,
+                year: viewingYear,
                 amount: amount
             });
 
@@ -95,7 +100,7 @@ export default function BudgetCard({ transactions }) {
     const handleDeleteBudget = async () => {
         if (window.confirm('Are you sure you want to delete this budget?')) {
             try {
-                await api.delete(`/budgets?month=${currentMonth}&year=${currentYear}`);
+                await api.delete(`/budgets?month=${viewingMonth}&year=${viewingYear}`);
                 setBudget(null);
                 setBudgetAmount('');
                 setError(null);
@@ -104,6 +109,32 @@ export default function BudgetCard({ transactions }) {
                 setError('Failed to delete budget');
             }
         }
+    };
+
+    // Navigate to previous month
+    const handlePreviousMonth = () => {
+        if (viewingMonth === 1) {
+            setViewingMonth(12);
+            setViewingYear(viewingYear - 1);
+        } else {
+            setViewingMonth(viewingMonth - 1);
+        }
+    };
+
+    // Navigate to next month
+    const handleNextMonth = () => {
+        if (viewingMonth === 12) {
+            setViewingMonth(1);
+            setViewingYear(viewingYear + 1);
+        } else {
+            setViewingMonth(viewingMonth + 1);
+        }
+    };
+
+    // Jump back to current month
+    const handleGoToCurrentMonth = () => {
+        setViewingMonth(actualCurrentMonth);
+        setViewingYear(actualCurrentYear);
     };
 
     // Calc progress
@@ -134,7 +165,7 @@ export default function BudgetCard({ transactions }) {
 
     // Get month name
     const getMonthName = () => {
-        return new Date(currentYear, currentMonth - 1).toLocaleDateString('en-US', { month: 'long' });
+        return new Date(viewingYear, viewingMonth - 1).toLocaleDateString('en-US', { month: 'long' });
     };
 
     if (loading) {
@@ -146,12 +177,46 @@ export default function BudgetCard({ transactions }) {
     }
 
     return (
-        <div className="bg-matcha-cream rounded-lg shadow p-6">
-            {/* Header */}
+        <div className="bg-matcha-cream rounded-lg shadow p-6 mb-6">
+            {/* Header with Month NAVVVV */}
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-matcha-darker">
-                    {getMonthName()} {currentYear} Budget
-                </h2>
+                <div className="flex items-center gap-4">
+                    {/* Prev month arrow */}
+                    <button
+                        onClick={handlePreviousMonth}
+                        className="px-3 py-1 text-matcha-darker hover:bg-matcha-light hover:text-white rounded-md transition-colors"
+                        title="Previous month"
+                    >
+                        ←
+                    </button>
+
+                    {/* Month/Year Display */}
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-2xl font-bold text-matcha-darker">
+                            {getMonthName()} {viewingYear}
+                        </h2>
+                        {!isViewingCurrentMonth && (
+                            <button
+                                onClick={handleGoToCurrentMonth}
+                                className="px-2 py-1 text-xs bg-matcha-light text-white rounded-md hover:bg-matcha"
+                                title="Go to current month"
+                            >
+                                Today
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Next month arrow */}
+                    <button
+                        onClick={handleNextMonth}
+                        className="px-3 py-1 text-matcha-darker hover:bg-matcha-light hover:text-white rounded-md transition-colors"
+                        title="Next month"
+                    >
+                        →
+                    </button>
+                </div>
+
+                {/* Edit/Delete Buttons */}
                 {budget && !isEditing && (
                     <div className="flex gap-2">
                         <button
@@ -180,7 +245,9 @@ export default function BudgetCard({ transactions }) {
             {/* No Budget Set */}
             {!budget && !isEditing && (
                 <div className="text-center py-8">
-                    <p className="text-gray-600 mb-4">No budget set for this month</p>
+                    <p className="text-gray-600 mb-4">
+                        No budget set for {getMonthName()} {viewingYear}
+                    </p>
                     <button
                         onClick={() => setIsEditing(true)}
                         className="px-4 py-2 bg-matcha-light hover:bg-matcha text-white rounded-md font-medium"
@@ -195,7 +262,7 @@ export default function BudgetCard({ transactions }) {
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Budget Amount
+                            Budget Amount for {getMonthName()} {viewingYear}
                         </label>
                         <input
                             type="number"

@@ -1,0 +1,29 @@
+meta {
+  name: Create Transaction
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/transactions
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "amount": 300.00,
+    "type": "EXPENSE",
+    "category": "Education",
+    "description": "fuck my fucking chungus life"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

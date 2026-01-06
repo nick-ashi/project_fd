@@ -38,7 +38,7 @@ public class User {
     private LocalDateTime createdAt;
 
     @Column(nullable = true)
-    private Long monthlyBudget
+    private Long monthlyBudget;
 
     @PrePersist
     public void onCreate() {

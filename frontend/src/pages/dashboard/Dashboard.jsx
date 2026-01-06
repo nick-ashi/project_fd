@@ -7,6 +7,7 @@ import TransactionModal from '../transactionEditor/TransactionModal';
 import {RiEditBoxFill} from "react-icons/ri";
 import {FaTrashCan} from "react-icons/fa6";
 import {MdCreditScore} from "react-icons/md";
+import BudgetCard from "../budgetCard/BudgetCard.jsx";
 
 /**
  * DASHBOARD PAGE
@@ -204,8 +205,12 @@ export default function Dashboard() {
                 </div>
             </div>
 
+            <div className="max-w-7xl mx-auto px-4 py-8 pb-2 sm:px-6 lg:px-8">
+                <BudgetCard transactions={transactions}/>
+            </div>
+
             {/* Transaction List */}
-            <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-4 pt-2 py-8 sm:px-6 lg:px-8">
                 <div className="bg-matcha-cream rounded-lg shadow p-6">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-matcha-darker mb-6">

@@ -32,7 +32,8 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // Allow requests from React frontend
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        String allowedOrigins = System.getenv().getOrDefault("CORS_ALLOWED_ORIGINS", "http://localhost:5173");
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
 
         // Allow common HTTP methods
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

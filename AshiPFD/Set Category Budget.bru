@@ -1,0 +1,29 @@
+meta {
+  name: Set Category Budget
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/budgets/categories
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "month": 1,
+    "year": 2026,
+    "category": "EDUCATION",
+    "amount": 900
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

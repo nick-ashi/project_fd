@@ -1,0 +1,26 @@
+meta {
+  name: Delete Category Budget
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/budgets/categories?month=1&year=2026&category=EDUCATION
+  body: none
+  auth: inherit
+}
+
+params:query {
+  month: 1
+  year: 2026
+  category: EDUCATION
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

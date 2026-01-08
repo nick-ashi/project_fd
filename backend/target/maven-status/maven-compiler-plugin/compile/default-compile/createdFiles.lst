@@ -1,6 +1,7 @@
 com/finance/ashipfd/controller/TestController.class
 com/finance/ashipfd/model/User.class
 com/finance/ashipfd/model/TransactionType.class
+com/finance/ashipfd/service/CategoryBudgetService.class
 com/finance/ashipfd/repository/BudgetRepository.class
 com/finance/ashipfd/controller/BudgetController.class
 com/finance/ashipfd/model/TransactionCategory.class
@@ -23,12 +24,17 @@ com/finance/ashipfd/AshiPfdApplication.class
 com/finance/ashipfd/repository/UserRepository.class
 com/finance/ashipfd/exception/TransactionNotFoundException.class
 com/finance/ashipfd/dto/UpdateTransactionRequest.class
+com/finance/ashipfd/repository/CategoryBudgetRepository.class
 com/finance/ashipfd/controller/UserController.class
 com/finance/ashipfd/exception/EmailAlreadyExistsException.class
 com/finance/ashipfd/dto/AuthResponse.class
+com/finance/ashipfd/controller/CategoryBudgetController.class
 com/finance/ashipfd/service/UserService.class
+com/finance/ashipfd/dto/CategoryBudgetRequest.class
 com/finance/ashipfd/dto/BudgetResponse.class
 com/finance/ashipfd/repository/TransactionRepository.class
+com/finance/ashipfd/model/CategoryBudget.class
+com/finance/ashipfd/dto/CategoryBudgetResponse.class
 com/finance/ashipfd/dto/TransactionResponse.class
 com/finance/ashipfd/controller/AuthController.class
 com/finance/ashipfd/controller/TransactionController.class

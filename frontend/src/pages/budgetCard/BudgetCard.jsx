@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { formatCategoryName } from '../../utils/formatters.js';
+import { TRANSACTION_CATEGORIES } from "../../utils/constants.js";
 import api from '../../api/axios';
 
 /**
@@ -20,6 +22,16 @@ export default function BudgetCard({ transactions }) {
     const [budgetAmount, setBudgetAmount] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Category budget states
+    const [categoryBudgets, setCategoryBudgets] = useState([]);
+    const [isCategoryExpanded, setIsCategoryExpanded] = useState(false);
+    const [isAddingCategory, setIsAddingCategory] = useState(false);
+    const [newCategoryBudget, setNewCategoryBudget] = useState({
+        category: '',
+        amount: ''
+    });
+    const [editingCategoryBudget, setEditingCategoryBudget] = useState(null);
 
     // Get current month and year
     const currentDate = new Date();
@@ -53,6 +65,7 @@ export default function BudgetCard({ transactions }) {
     // Fetch budget on component looads
     useEffect(() => {
         fetchBudget();
+        fetchCategoryBudgets();
     }, [viewingMonth, viewingYear]);
 
     const fetchBudget = async () => {
@@ -71,6 +84,16 @@ export default function BudgetCard({ transactions }) {
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchCategoryBudgets = async () => {
+        try {
+            const res = await api.get(`/budgets/categories?month=${viewingMonth}&year=${viewingYear}`);
+            setCategoryBudgets(res.data);
+        } catch (err) {
+            console.error('Failed to fetch category budgets:', err);
+            // Don't set error - category budgets are OPTIONAL
         }
     };
 
@@ -135,6 +158,86 @@ export default function BudgetCard({ transactions }) {
     const handleGoToCurrentMonth = () => {
         setViewingMonth(actualCurrentMonth);
         setViewingYear(actualCurrentYear);
+    };
+
+    // Category budget saves
+    const handleSaveCategoryBudget = async () => {
+        try {
+            const amount = parseFloat(newCategoryBudget.amount);
+            if (!newCategoryBudget.category || isNaN(amount) || amount <= 0) {
+                setError('Please select a category and enter a valid amount');
+                return;
+            }
+
+            await api.put(`/budgets/categories`, {
+                month: viewingMonth,
+                year: viewingYear,
+                category: newCategoryBudget.category,
+                amount: amount
+            });
+
+            await fetchCategoryBudgets();
+            setIsAddingCategory(false);
+            setNewCategoryBudget({ category: '', amount: '' });
+            setError(null);
+
+        } catch (err) {
+            console.error('Failed to save category budget:', err);
+            setError(err.response?.data?.message || 'Failed to save category budget');
+        }
+    };
+
+    // Update category budget
+    const handleUpdateCategoryBudget = async () => {
+        try {
+            const amount = parseFloat(editingCategoryBudget.amount);
+            if (isNaN(amount) || amount <= 0) {
+                setError('Please enter a valid amount');
+                return;
+            }
+
+            await api.put('/budgets/categories', {
+                month: viewingMonth,
+                year: viewingYear,
+                category: editingCategoryBudget.category,
+                amount: amount
+            });
+
+            await fetchCategoryBudgets();
+            setEditingCategoryBudget(null);
+            setError(null);
+        } catch (err) {
+            console.error('Failed to update category budget:', err);
+            setError('Failed to update category budget');
+        }
+    };
+
+    // Delete categorybudget
+    const handleDeleteCategoryBudget = async (category) => {
+        if (window.confirm(`Delete budget for ${formatCategoryName(category)}?`)) {
+            try {
+                await api.delete(`/budgets/categories?month=${viewingMonth}&year=${viewingYear}&category=${category}`);
+                await fetchCategoryBudgets();
+            } catch (err) {
+                console.error('Failed to delete category budget:', err);
+                setError('Failed to delete category budget');
+            }
+        }
+    };
+
+    // Calc the spend for a specific category
+    const calculateCategorySpending = (category) => {
+        return transactions
+            .filter(t => {
+                if (t.type !== 'EXPENSE' || t.category !== category) return false;
+
+                const [year, month, day] = t.transactionDate.split("-");
+                const transDate = new Date(year, month - 1, day);
+
+                return transDate.getMonth() + 1 === viewingMonth &&
+                    transDate.getFullYear() === viewingYear;
+            })
+            .reduce((sum, t) => sum + parseFloat(t.amount), 0);
     };
 
     // Calc progress
@@ -334,6 +437,214 @@ export default function BudgetCard({ transactions }) {
                             />
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Category Budgets Accordion */}
+            {budget && !isEditing && (
+                <div className="mt-6 border-t pt-4">
+                    {/* Accordion Header */}
+                    <button
+                        onClick={() => setIsCategoryExpanded(!isCategoryExpanded)}
+                        className="w-full flex justify-between items-center text-left hover:bg-gray-50 p-2 rounded transition-colors"
+                    >
+                        <div className="flex items-center gap-2">
+                              <span className="text-lg font-semibold text-matcha-darker">
+                                  Category Budgets
+                              </span>
+                            {categoryBudgets.length > 0 && (
+                                <span className="text-sm text-gray-500">
+                                      ({categoryBudgets.length} set)
+                                  </span>
+                            )}
+                        </div>
+                        <span className="text-2xl text-matcha-darker">
+                              {isCategoryExpanded ? '▼' : '▶'}
+                          </span>
+                    </button>
+
+                    {/* Expanded Content */}
+                    {isCategoryExpanded && (
+                        <div className="mt-4 space-y-3">
+                            {/* Category Budget List */}
+                            {categoryBudgets.map((catBudget) => {
+                                const spent = calculateCategorySpending(catBudget.category);
+                                const percentage = Math.min((spent / catBudget.amount) * 100, 100);
+
+                                const getColor = () => {
+                                    if (percentage >= 100) return 'bg-red-500';
+                                    if (percentage >= 80) return 'bg-yellow-500';
+                                    if (percentage >= 60) return 'bg-yellow-400';
+                                    return 'bg-green-500';
+                                };
+
+                                // Check if this category is being edited
+                                const isEditing = editingCategoryBudget?.category === catBudget.category;
+
+                                return (
+                                    <div key={catBudget.id} className="bg-gray-50 p-4 rounded-lg">
+                                        {isEditing ? (
+                                            // Edit Mode
+                                            <div className="space-y-3">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        {formatCategoryName(catBudget.category)}
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        value={editingCategoryBudget.amount}
+                                                        onChange={(e) => setEditingCategoryBudget({
+                                                            ...editingCategoryBudget,
+                                                            amount: e.target.value
+                                                        })}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-matcha-light"
+                                                        placeholder="Enter amount"
+                                                    />
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={handleUpdateCategoryBudget}
+                                                        className="flex-1 px-3 py-2 bg-matcha-light hover:bg-matcha text-white rounded-md text-sm"
+                                                    >
+                                                        Save
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditingCategoryBudget(null);
+                                                            setError(null);
+                                                        }}
+                                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            // Display Mode
+                                            <>
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div>
+                                                        <h4 className="font-bold text-gray-900">
+                                                            {formatCategoryName(catBudget.category)}
+                                                        </h4>
+                                                        <p className="text-sm text-gray-600">
+                                                            <span className="font-semibold">{formatCurrency(catBudget.amount)}</span> budget
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => setEditingCategoryBudget({
+                                                                category: catBudget.category,
+                                                                amount: catBudget.amount
+                                                            })}
+                                                            className="px-3 py-1 text-sm bg-matcha-light hover:bg-matcha text-white rounded-md"
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteCategoryBudget(catBudget.category)}
+                                                            className="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-1">
+                                                    <div className="flex justify-between text-sm">
+                              <span className="font-semibold text-gray-600">
+                                  Spent: {formatCurrency(spent)}
+                              </span>
+                                                        <span className={percentage >= 100 ? 'text-red-600 font-semibold' : 'text-gray-600'}>
+                                  {percentage.toFixed(0)}%
+                              </span>
+                                                    </div>
+                                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                                        <div
+                                                            className={`h-2 rounded-full transition-all duration-300 ${getColor()}`}
+                                                            style={{ width: `${percentage}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                );
+                            })}
+
+                            {/* Add Category Budget Form */}
+                            {isAddingCategory ? (
+                                <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Category
+                                        </label>
+                                        <select
+                                            value={newCategoryBudget.category}
+                                            onChange={(e) => setNewCategoryBudget({
+                                                ...newCategoryBudget,
+                                                category: e.target.value
+                                            })}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-matcha-light"
+                                        >
+                                            <option value="">Select a category</option>
+                                            {/* Only show categories that don't have budgets yet */}
+                                            {Object.keys(TRANSACTION_CATEGORIES)
+                                                .filter(cat => !categoryBudgets.find(cb => cb.category === cat))
+                                                .map(cat => (
+                                                    <option key={cat} value={cat}>
+                                                        {TRANSACTION_CATEGORIES[cat]}
+                                                    </option>
+                                                ))
+                                            }
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Budget Amount
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={newCategoryBudget.amount}
+                                            onChange={(e) => setNewCategoryBudget({
+                                                ...newCategoryBudget,
+                                                amount: e.target.value
+                                            })}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-matcha-light"
+                                            placeholder="Enter amount"
+                                        />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={handleSaveCategoryBudget}
+                                            className="flex-1 px-3 py-2 bg-matcha-light hover:bg-matcha text-white rounded-md text-sm"
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setIsAddingCategory(false);
+                                                setNewCategoryBudget({ category: '', amount: '' });
+                                                setError(null);
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setIsAddingCategory(true)}
+                                    className="w-full px-4 py-3 border-2 border-dashed border-matcha-darker rounded-lg text-matcha-darker hover:border-matcha-light hover:text-matcha-light transition-colors"
+                                >
+                                    + Add Category Budget
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
             )}
         </div>

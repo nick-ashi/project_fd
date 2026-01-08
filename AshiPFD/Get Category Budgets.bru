@@ -1,0 +1,25 @@
+meta {
+  name: Get Category Budgets
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/budgets/categories?month=1&year=2026
+  body: none
+  auth: inherit
+}
+
+params:query {
+  month: 1
+  year: 2026
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

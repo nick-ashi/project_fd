@@ -13,6 +13,7 @@ export default {
           dark: '#44624a',      // Deep matcha green
           DEFAULT: '#8ba888',   // Medium matcha green
           light: '#c0cfb2',     // Light matcha green
+          creamDarker: '#c9b39b',
           cream: '#f1ebe1',     // Very light cream
         },
       },

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import {TRANSACTION_CATEGORIES} from "../../utils/constants.js";
 
 /**
  * TRANSACTION EDITOR MODAL
@@ -148,67 +149,73 @@ export default function TransactionModal( { isOpen, onClose, onSave, transaction
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-matcha-light"
                         >
                             <option value="">Select a category</option>
+                            {Object.keys(TRANSACTION_CATEGORIES)
+                                .map(cat => (
+                                    <option key={cat} value={cat}>
+                                        {TRANSACTION_CATEGORIES[cat]}
+                                    </option>
+                                ))
+                            }
+                            {/*/!* Income Categories *!/*/}
+                            {/*<optgroup label="Income">*/}
+                            {/*    <option value="SALARY">Salary</option>*/}
+                            {/*    <option value="BUSINESS_INCOME">Business Income</option>*/}
+                            {/*    <option value="INVESTMENT_RETURNS">Investment Returns</option>*/}
+                            {/*    <option value="RENTAL_INCOME">Rental Income</option>*/}
+                            {/*    <option value="GIFTS_RECEIVED">Gifts Received</option>*/}
+                            {/*    <option value="TAX_REFUND">Tax Refund</option>*/}
+                            {/*    <option value="BONUS">Bonus</option>*/}
+                            {/*    <option value="SIDE_HUSTLE">Side Hustle</option>*/}
+                            {/*    <option value="OTHER_INCOME">Other Income</option>*/}
+                            {/*</optgroup>*/}
 
-                            {/* Income Categories */}
-                            <optgroup label="Income">
-                                <option value="SALARY">Salary</option>
-                                <option value="BUSINESS_INCOME">Business Income</option>
-                                <option value="INVESTMENT_RETURNS">Investment Returns</option>
-                                <option value="RENTAL_INCOME">Rental Income</option>
-                                <option value="GIFTS_RECEIVED">Gifts Received</option>
-                                <option value="TAX_REFUND">Tax Refund</option>
-                                <option value="BONUS">Bonus</option>
-                                <option value="SIDE_HUSTLE">Side Hustle</option>
-                                <option value="OTHER_INCOME">Other Income</option>
-                            </optgroup>
+                            {/*/!* Expense Categories - Essential *!/*/}
+                            {/*<optgroup label="Essential Expenses">*/}
+                            {/*    <option value="RENT_MORTGAGE">Rent/Mortgage</option>*/}
+                            {/*    <option value="UTILITIES">Utilities</option>*/}
+                            {/*    <option value="GROCERIES">Groceries</option>*/}
+                            {/*    <option value="TRANSPORTATION">Transportation</option>*/}
+                            {/*    <option value="GAS">Gas/Fuel</option>*/}
+                            {/*    <option value="INSURANCE">Insurance</option>*/}
+                            {/*    <option value="PHONE_INTERNET">Phone & Internet</option>*/}
+                            {/*    <option value="HEALTHCARE">Healthcare</option>*/}
+                            {/*    <option value="DEBT_PAYMENTS">Debt Payments</option>*/}
+                            {/*</optgroup>*/}
 
-                            {/* Expense Categories - Essential */}
-                            <optgroup label="Essential Expenses">
-                                <option value="RENT_MORTGAGE">Rent/Mortgage</option>
-                                <option value="UTILITIES">Utilities</option>
-                                <option value="GROCERIES">Groceries</option>
-                                <option value="TRANSPORTATION">Transportation</option>
-                                <option value="GAS">Gas/Fuel</option>
-                                <option value="INSURANCE">Insurance</option>
-                                <option value="PHONE_INTERNET">Phone & Internet</option>
-                                <option value="HEALTHCARE">Healthcare</option>
-                                <option value="DEBT_PAYMENTS">Debt Payments</option>
-                            </optgroup>
+                            {/*/!* Expense Categories - Lifestyle *!/*/}
+                            {/*<optgroup label="Lifestyle">*/}
+                            {/*    <option value="DINING_OUT">Dining Out</option>*/}
+                            {/*    <option value="DELIVERY">Delivery</option>*/}
+                            {/*    <option value="ENTERTAINMENT">Entertainment</option>*/}
+                            {/*    <option value="SHOPPING">Shopping</option>*/}
+                            {/*    <option value="SUBSCRIPTIONS">Subscriptions</option>*/}
+                            {/*    <option value="GYM_FITNESS">Gym & Fitness</option>*/}
+                            {/*    <option value="TRAVEL">Travel</option>*/}
+                            {/*    <option value="HOBBIES">Hobbies</option>*/}
+                            {/*    <option value="PERSONAL_CARE">Personal Care</option>*/}
+                            {/*    <option value="GIFTS_GIVEN">Gifts Given</option>*/}
+                            {/*</optgroup>*/}
 
-                            {/* Expense Categories - Lifestyle */}
-                            <optgroup label="Lifestyle">
-                                <option value="DINING_OUT">Dining Out</option>
-                                <option value="DELIVERY">Delivery</option>
-                                <option value="ENTERTAINMENT">Entertainment</option>
-                                <option value="SHOPPING">Shopping</option>
-                                <option value="SUBSCRIPTIONS">Subscriptions</option>
-                                <option value="GYM_FITNESS">Gym & Fitness</option>
-                                <option value="TRAVEL">Travel</option>
-                                <option value="HOBBIES">Hobbies</option>
-                                <option value="PERSONAL_CARE">Personal Care</option>
-                                <option value="GIFTS_GIVEN">Gifts Given</option>
-                            </optgroup>
+                            {/*/!* Expense Categories - Financial *!/*/}
+                            {/*<optgroup label="Financial">*/}
+                            {/*    <option value="SAVINGS">Savings</option>*/}
+                            {/*    <option value="INVESTMENTS">Investments</option>*/}
+                            {/*    <option value="EMERGENCY_FUND">Emergency Fund</option>*/}
+                            {/*    <option value="RETIREMENT">Retirement</option>*/}
+                            {/*    <option value="TAXES">Taxes</option>*/}
+                            {/*    <option value="BANK_FEES">Bank Fees</option>*/}
+                            {/*</optgroup>*/}
 
-                            {/* Expense Categories - Financial */}
-                            <optgroup label="Financial">
-                                <option value="SAVINGS">Savings</option>
-                                <option value="INVESTMENTS">Investments</option>
-                                <option value="EMERGENCY_FUND">Emergency Fund</option>
-                                <option value="RETIREMENT">Retirement</option>
-                                <option value="TAXES">Taxes</option>
-                                <option value="BANK_FEES">Bank Fees</option>
-                            </optgroup>
-
-                            {/* Miscellaneous */}
-                            <optgroup label="Other">
-                                <option value="EDUCATION">Education</option>
-                                <option value="CHARITY">Charity/Donations</option>
-                                <option value="PET_EXPENSES">Pet Expenses</option>
-                                <option value="HOME_IMPROVEMENT">Home Improvement</option>
-                                <option value="CLOTHING">Clothing</option>
-                                <option value="BOOKS_MEDIA">Books & Media</option>
-                                <option value="OTHER_EXPENSE">Other Expense</option>
-                            </optgroup>
+                            {/*/!* Miscellaneous *!/*/}
+                            {/*<optgroup label="Other">*/}
+                            {/*    <option value="EDUCATION">Education</option>*/}
+                            {/*    <option value="CHARITY">Charity/Donations</option>*/}
+                            {/*    <option value="PET_EXPENSES">Pet Expenses</option>*/}
+                            {/*    <option value="HOME_IMPROVEMENT">Home Improvement</option>*/}
+                            {/*    <option value="CLOTHING">Clothing</option>*/}
+                            {/*    <option value="BOOKS_MEDIA">Books & Media</option>*/}
+                            {/*    <option value="OTHER_EXPENSE">Other Expense</option>*/}
+                            {/*</optgroup>*/}
                         </select>
                     </div>
 

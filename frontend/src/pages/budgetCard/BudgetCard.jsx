@@ -62,6 +62,12 @@ export default function BudgetCard({ transactions }) {
 
     const monthlyExpenses = calculateMonthlyExpenses();
 
+    const calculateMonthlyIncome = () => {
+        return transactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    }
+
+    const monthlyIncome = calculateMonthlyIncome();
+
     // Fetch budget on component looads
     useEffect(() => {
         fetchBudget();
@@ -401,21 +407,27 @@ export default function BudgetCard({ transactions }) {
             {budget && !isEditing && (
                 <div className="space-y-4">
                     {/* Stats */}
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-4 gap-4">
                         <div>
-                            <p className="text-sm text-gray-600">Budget</p>
+                            <p className="text-sm font-bold text-gray-600">Budget</p>
                             <p className="text-xl font-bold text-matcha-darker">
                                 {formatCurrency(budget.amount)}
                             </p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">Spent</p>
+                            <p className="text-sm font-bold text-gray-600">Spent</p>
                             <p className="text-xl font-bold text-gray-900">
                                 {formatCurrency(monthlyExpenses)}
                             </p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">Remaining</p>
+                            <p className="text-sm font-bold text-gray-600">Earned</p>
+                            <p className="text-xl font-bold text-green-600">
+                                {formatCurrency(monthlyIncome)}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-gray-600">Remaining</p>
                             <p className={`text-xl font-bold ${getRemainingAmountColor()}`}>
                                 {formatCurrency(budget.amount - monthlyExpenses)}
                             </p>
@@ -589,7 +601,7 @@ export default function BudgetCard({ transactions }) {
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-matcha-light"
                                         >
                                             <option value="">Select a category</option>
-                                            {/* Only show categories that don't have budgets yet */}
+                                            {/* Only show categories that don't have budgets tho */}
                                             {Object.keys(TRANSACTION_CATEGORIES)
                                                 .filter(cat => !categoryBudgets.find(cb => cb.category === cat))
                                                 .map(cat => (

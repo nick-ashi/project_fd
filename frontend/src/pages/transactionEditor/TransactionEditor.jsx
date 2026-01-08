@@ -21,7 +21,7 @@ export default function TransactionEditor() {
         amount: '',
     });
 
-    const nav = useNavigate();
+    // const nav = useNavigate();
 
     return (
         <div>

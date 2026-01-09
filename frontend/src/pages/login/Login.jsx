@@ -45,10 +45,11 @@ export default function Login() {
             <div className="max-w-md w-full space-y-8 p-8 bg-matcha-cream rounded-lg shadow">
                 {/* Header */}
                 <div>
-                    <h1 className="text-left text-3xl font-bold text-matcha-darker">
+                    <img src="/favicon-96x96.png" alt="logo" className="w-24 h-24 justify-center mx-auto" />
+                    <h1 className="text-center text-3xl font-bold text-matcha-darker">
                         Welcome to AshiPFD
                     </h1>
-                    <h3 className="text-left text-xl font-bold text-matcha-darker">
+                    <h3 className="text-center text-xl font-bold text-matcha-darker">
                         Sign in to start saving 💰
                     </h3>
                 </div>

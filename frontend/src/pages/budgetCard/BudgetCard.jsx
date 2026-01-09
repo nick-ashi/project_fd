@@ -286,28 +286,28 @@ export default function BudgetCard({ transactions }) {
     }
 
     return (
-        <div className="bg-matcha-cream rounded-lg shadow p-6 mb-6">
+        <div className="bg-matcha-cream rounded-lg shadow p-4 sm:p-6 mb-6">
             {/* Header with Month NAVVVV */}
-            <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-4">
                     {/* Prev month arrow */}
                     <button
                         onClick={handlePreviousMonth}
-                        className="px-3 py-1 text-matcha-darker hover:bg-matcha-light hover:text-white rounded-md transition-colors"
+                        className="px-2 sm:px-3 py-1 text-matcha-darker hover:bg-matcha-light hover:text-white rounded-md transition-colors"
                         title="Previous month"
                     >
                         ←
                     </button>
 
                     {/* Month/Year Display */}
-                    <div className="flex items-center gap-2">
-                        <h2 className="text-2xl font-bold text-matcha-darker">
+                    <div className="flex items-center gap-2 flex-1 sm:flex-initial justify-center sm:justify-start">
+                        <h2 className="text-lg sm:text-2xl font-bold text-matcha-darker">
                             {getMonthName()} {viewingYear}
                         </h2>
                         {!isViewingCurrentMonth && (
                             <button
                                 onClick={handleGoToCurrentMonth}
-                                className="px-2 py-1 text-xs bg-matcha-light text-white rounded-md hover:bg-matcha"
+                                className="px-2 py-1 text-xs bg-matcha-light text-white rounded-md hover:bg-matcha whitespace-nowrap"
                                 title="Go to current month"
                             >
                                 Today
@@ -318,7 +318,7 @@ export default function BudgetCard({ transactions }) {
                     {/* Next month arrow */}
                     <button
                         onClick={handleNextMonth}
-                        className="px-3 py-1 text-matcha-darker hover:bg-matcha-light hover:text-white rounded-md transition-colors"
+                        className="px-2 sm:px-3 py-1 text-matcha-darker hover:bg-matcha-light hover:text-white rounded-md transition-colors"
                         title="Next month"
                     >
                         →
@@ -327,16 +327,16 @@ export default function BudgetCard({ transactions }) {
 
                 {/* Edit/Delete Buttons */}
                 {budget && !isEditing && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 w-full sm:w-auto">
                         <button
                             onClick={() => setIsEditing(true)}
-                            className="px-3 py-1 text-sm bg-matcha-light hover:bg-matcha text-white rounded-md"
+                            className="flex-1 sm:flex-initial px-3 py-1 text-sm bg-matcha-light hover:bg-matcha text-white rounded-md"
                         >
                             Edit
                         </button>
                         <button
                             onClick={handleDeleteBudget}
-                            className="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md"
+                            className="flex-1 sm:flex-initial px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md"
                         >
                             Delete
                         </button>
@@ -407,28 +407,28 @@ export default function BudgetCard({ transactions }) {
             {budget && !isEditing && (
                 <div className="space-y-4">
                     {/* Stats */}
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                         <div>
-                            <p className="text-sm font-bold text-gray-600">Budget</p>
-                            <p className="text-xl font-bold text-matcha-darker">
+                            <p className="text-xs sm:text-sm font-bold text-gray-600">Budget</p>
+                            <p className="text-base sm:text-xl font-bold text-matcha-darker">
                                 {formatCurrency(budget.amount)}
                             </p>
                         </div>
                         <div>
-                            <p className="text-sm font-bold text-gray-600">Spent</p>
-                            <p className="text-xl font-bold text-gray-900">
+                            <p className="text-xs sm:text-sm font-bold text-gray-600">Spent</p>
+                            <p className="text-base sm:text-xl font-bold text-matcha-darker">
                                 {formatCurrency(monthlyExpenses)}
                             </p>
                         </div>
                         <div>
-                            <p className="text-sm font-bold text-gray-600">Earned</p>
-                            <p className="text-xl font-bold text-green-600">
+                            <p className="text-xs sm:text-sm font-bold text-gray-600">Earned</p>
+                            <p className="text-base sm:text-xl font-bold text-green-600">
                                 {formatCurrency(monthlyIncome)}
                             </p>
                         </div>
                         <div>
-                            <p className="text-sm font-bold text-gray-600">Remaining</p>
-                            <p className={`text-xl font-bold ${getRemainingAmountColor()}`}>
+                            <p className="text-xs sm:text-sm font-bold text-gray-600">Remaining</p>
+                            <p className={`text-base sm:text-xl font-bold ${getRemainingAmountColor()}`}>
                                 {formatCurrency(budget.amount - monthlyExpenses)}
                             </p>
                         </div>

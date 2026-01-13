@@ -50,7 +50,7 @@ function App() {
                 element={<Register />}
             />
 
-            {/* Dashboard - TODO */}
+            {/* Dashboard */}
             <Route
                 path="/dashboard"
                 element={<Dashboard />}

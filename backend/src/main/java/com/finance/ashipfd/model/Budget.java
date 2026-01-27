@@ -1,5 +1,6 @@
 package com.finance.ashipfd.model;
 
+import com.finance.ashipfd.model.BudgetType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,6 +36,14 @@ public class Budget {
 
     @Column(nullable = false)
     private Integer year;
+
+    /**
+     * HOW the budget is set
+     * Categorically summed vs. Singular Budget (optional categories)
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'GENERAL'")
+    private BudgetType budgetType = BudgetType.GENERAL;
 
     /**
      * Budget amt for month

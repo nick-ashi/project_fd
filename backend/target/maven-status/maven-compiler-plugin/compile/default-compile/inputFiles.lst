@@ -4,7 +4,6 @@
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/controller/AuthController.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/controller/BudgetController.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/controller/CategoryBudgetController.java
-/Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/controller/TestController.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/controller/TransactionController.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/controller/UserController.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/dto/AuthResponse.java
@@ -23,6 +22,7 @@
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/exception/InvalidCredentialsException.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/exception/TransactionNotFoundException.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/model/Budget.java
+/Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/model/BudgetType.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/model/CategoryBudget.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/model/Transaction.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/model/TransactionCategory.java

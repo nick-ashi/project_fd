@@ -1,5 +1,6 @@
 package com.finance.ashipfd.dto;
 
+import com.finance.ashipfd.model.BudgetType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -28,8 +29,10 @@ public class BudgetRequest {
     @Max(value = 2100, message = "That's a hopeful amount of time you're entering..")
     private Integer year;
 
-    @NotNull(message = "Amount is required")
-    @DecimalMin(value = "0.01", message = "Amount must be greater than $0")
+    @NotNull(message = "Budget type is required")
+    private BudgetType budgetType;
+
+    @DecimalMin(value = "0.01", message = "Amount must be > $0.00")
     private BigDecimal amount;
 
 

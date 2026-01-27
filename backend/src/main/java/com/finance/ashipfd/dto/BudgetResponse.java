@@ -1,5 +1,6 @@
 package com.finance.ashipfd.dto;
 
+import com.finance.ashipfd.model.BudgetType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,13 @@ public class BudgetResponse {
     private Long userId;
     private Integer month;
     private Integer year;
+    private BudgetType budgetType;
     private BigDecimal amount;
+    /**
+     * GENERAL budget: same as amount
+     * CATEGORY_BUDGET budget: calculated from category budget totals
+     */
+    private BigDecimal effectiveAmount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

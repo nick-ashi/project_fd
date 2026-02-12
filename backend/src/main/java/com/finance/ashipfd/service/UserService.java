@@ -97,8 +97,6 @@ public class UserService {
             throw new InvalidCredentialsException();
         }
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getId());
-
-        return token;
+        return jwtUtil.generateToken(user.getEmail(), user.getId());
     }
 }

@@ -29,7 +29,7 @@ export const useAuth = () => {
     return context;
 }
 
-// Provider component ; this thing wraps around the WHOLE app
+// Provider component; this thing wraps around the WHOLE app
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);

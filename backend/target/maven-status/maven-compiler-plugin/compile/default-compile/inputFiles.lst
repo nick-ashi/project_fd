@@ -7,6 +7,7 @@
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/controller/TransactionController.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/controller/UserController.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/dto/AuthResponse.java
+/Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/dto/BudgetCopyRequest.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/dto/BudgetRequest.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/dto/BudgetResponse.java
 /Users/nickashizawa/IdeaProjects/PFDashboard/backend/src/main/java/com/finance/ashipfd/dto/CategoryBudgetRequest.java

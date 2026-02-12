@@ -8,6 +8,7 @@ com/finance/ashipfd/security/JwtUtil.class
 com/finance/ashipfd/service/BudgetService.class
 com/finance/ashipfd/service/TransactionService.class
 com/finance/ashipfd/dto/CreateTransactionRequest.class
+com/finance/ashipfd/dto/BudgetCopyRequest.class
 com/finance/ashipfd/dto/ErrorResponse.class
 com/finance/ashipfd/dto/RegisterRequest.class
 com/finance/ashipfd/config/SecurityConfig.class

@@ -35,7 +35,7 @@ public class CorsConfig {
         String allowedOrigins = System.getenv().getOrDefault("CORS_ALLOWED_ORIGINS", "http://localhost:5173");
         config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
 
-        // Allow common HTTP methods
+        // Allow common HTTP methods (ig this wasn't super necessary)
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
         // Allow all headers (including auth for JWT)

@@ -1,5 +1,6 @@
 package com.finance.ashipfd.service;
 
+import com.finance.ashipfd.dto.BudgetCopyRequest;
 import com.finance.ashipfd.model.BudgetType;
 import com.finance.ashipfd.model.CategoryBudget;
 import com.finance.ashipfd.repository.CategoryBudgetRepository;
@@ -7,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import com.finance.ashipfd.dto.BudgetRequest;
 import com.finance.ashipfd.dto.BudgetResponse;
+import com.finance.ashipfd.dto.BudgetCopyRequest;
 import com.finance.ashipfd.model.Budget;
 import com.finance.ashipfd.model.User;
 import com.finance.ashipfd.repository.BudgetRepository;
@@ -123,6 +125,62 @@ public class BudgetService {
     public void deleteBudget(Long userId, Integer month, Integer year) {
         Optional<Budget> budget = budgetRepository.findByUserIdAndMonthAndYear(userId, month, year);
         budget.ifPresent(budgetRepository::delete);
+    }
+
+    /**
+     * Copy budget from one month/year to another
+     * @param req -- copy request with source/target month/year
+     * @param userId -- user ID from JWT
+     * @return Created budget DTO
+     */
+    public BudgetResponse copyBudget(BudgetCopyRequest req, Long userId) {
+        Optional<Budget> sourceBudgetOpt = budgetRepository.findByUserIdAndMonthAndYear(
+                userId, req.getSourceMonth(), req.getSourceYear());
+
+        if (sourceBudgetOpt.isEmpty()) {
+            throw new IllegalArgumentException("Source budget not found");
+        }
+
+        Budget sourceBudget = sourceBudgetOpt.get();
+        User user = userService.findById(userId);
+
+        Optional<Budget> existingTarget = budgetRepository.findByUserIdAndMonthAndYear(
+                userId, req.getTargetMonth(), req.getTargetYear());
+
+        if (existingTarget.isPresent()) {
+            throw new IllegalArgumentException("Target budget already exists");
+        }
+
+        Budget targetBudget = new Budget();
+        targetBudget.setUser(user);
+        targetBudget.setMonth(req.getTargetMonth());
+        targetBudget.setYear(req.getTargetYear());
+        targetBudget.setBudgetType(sourceBudget.getBudgetType());
+
+        if (sourceBudget.getBudgetType() == BudgetType.GENERAL && req.isCopyBudgetAmount()) {
+            targetBudget.setAmount(sourceBudget.getAmount());
+        } else {
+            targetBudget.setAmount(BigDecimal.ZERO);
+        }
+
+        Budget savedBudget = budgetRepository.save(targetBudget);
+
+        if (req.isCopyCategories()) {
+            List<CategoryBudget> sourceCategories = categoryBudgetRepository
+                    .findByUserIdAndMonthAndYear(userId, req.getSourceMonth(), req.getSourceYear());
+
+            for (CategoryBudget sourceCat : sourceCategories) {
+                CategoryBudget targetCat = new CategoryBudget();
+                targetCat.setUser(user);
+                targetCat.setMonth(req.getTargetMonth());
+                targetCat.setYear(req.getTargetYear());
+                targetCat.setCategory(sourceCat.getCategory());
+                targetCat.setAmount(sourceCat.getAmount());
+                categoryBudgetRepository.save(targetCat);
+            }
+        }
+
+        return toDTO(savedBudget);
     }
 
     /**

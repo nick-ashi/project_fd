@@ -1,12 +1,16 @@
 package com.finance.ashipfd.controller;
 
+import com.finance.ashipfd.dto.BudgetCopyRequest;
 import com.finance.ashipfd.dto.BudgetRequest;
 import com.finance.ashipfd.dto.BudgetResponse;
+import com.finance.ashipfd.model.User;
 import com.finance.ashipfd.service.BudgetService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -108,5 +112,23 @@ public class BudgetController {
         budgetService.deleteBudget(userId, month, year);
 
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * POST /api/budgets/copy
+     *
+     * Copy budget from one month/year to another
+     *
+     * @param req - copy budget request
+     * @param auth -
+     * @return Created budget DTO
+     */
+    @PostMapping("/copy")
+    public ResponseEntity<BudgetResponse> copyBudget(
+            @Valid @RequestBody BudgetCopyRequest req,
+            Authentication auth) {
+        Long userId = (Long) auth.getPrincipal();
+        BudgetResponse budget = budgetService.copyBudget(req, userId);
+        return ResponseEntity.ok(budget);
     }
 }

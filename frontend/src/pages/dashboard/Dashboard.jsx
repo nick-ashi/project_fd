@@ -27,6 +27,10 @@ export default function Dashboard() {
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTransaction, setEditingTransaction] = useState(null);
+    // for monthly viewing
+    const [viewingMonth, setViewingMonth] = useState(new Date().getMonth() + 1);
+    const [viewingYear, setViewingYear] = useState(new Date().getFullYear());
+    const [viewMode, setViewMode] = useState('month');
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1); // which page rn
@@ -170,7 +174,7 @@ export default function Dashboard() {
 
     // Sort transactions based on sortConfig
     const getSortedTransactions = () => {
-        const sorted = [...transactions].sort((a, b) => {
+        const sorted = [...getFilteredTransactions()].sort((a, b) => {
             for (const sort of sortConfig) {
                 let aVal = a[sort.key];
                 let bVal = b[sort.key];
@@ -204,8 +208,17 @@ export default function Dashboard() {
         return sorted.slice(startIndex, endIndex);
     };
 
+    const getFilteredTransactions = () => {
+        if (viewMode === 'all') return transactions;
+
+        return transactions.filter(t => {
+            const [year, month] = t.transactionDate.split('-');
+            return parseInt(month) === viewingMonth && parseInt(year) === viewingYear;
+        })
+    }
+
     // Calculate total pages
-    const totalPages = Math.ceil(transactions.length / itemsPerPage);
+    const totalPages = Math.ceil(getFilteredTransactions().length / itemsPerPage);
 
     // Get sort indicator for column
     const getSortIndicator = (key) => {
@@ -247,8 +260,17 @@ export default function Dashboard() {
                 </div>
             </div>
 
+            {/* Budget Card */}
             <div className="max-w-7xl mx-auto px-4 py-8 pb-2 sm:px-6 lg:px-8">
-                <BudgetCard transactions={transactions}/>
+                <BudgetCard
+                    transactions={transactions}
+                    viewingMonth={viewingMonth}
+                    viewingYear={viewingYear}
+                    onMonthChange={(month, year) => {
+                        setViewingMonth(month);
+                        setViewingYear(year);
+                    }}
+                />
             </div>
 
             {/* Transaction List */}
@@ -308,26 +330,44 @@ export default function Dashboard() {
                     {!loading && !error && transactions.length > 0 && (
                         <div className="space-y-4">
                             {/* Pagination Controls - Top */}
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-center mb-4">
                                 <div className="text-sm text-gray-600">
                                     Seeing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, transactions.length)} out of your {transactions.length} recorded transactions
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="text-sm text-gray-600">Per page:</label>
-                                    <select
-                                        value={itemsPerPage}
-                                        onChange={(e) => {
-                                            setItemsPerPage(Number(e.target.value));
-                                            setCurrentPage(1);
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
+                                        <label className="text-sm text-gray-600">Per page:</label>
+                                        <select
+                                            value={itemsPerPage}
+                                            onChange={(e) => {
+                                                setItemsPerPage(Number(e.target.value));
+                                                setCurrentPage(1);
+                                            }}
+                                            className="px-2 py-1 border border-gray-300 rounded-md text-sm"
+                                        >
+                                            <option value={5}>5</option>
+                                            <option value={10}>10</option>
+                                            <option value={25}>25</option>
+                                            <option value={50}>50</option>
+                                            <option value={100}>100</option>
+                                        </select>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            if (viewMode === 'month') setViewMode('all');
+                                            if (viewMode === 'all') setViewMode('month');
                                         }}
-                                        className="px-2 py-1 border border-gray-300 rounded-md text-sm"
+                                        className="px-3 py-2 bg-matcha-light hover:bg-matcha transform transition-all duration-600 text-white rounded-md font-medium"
                                     >
-                                        <option value={5}>5</option>
-                                        <option value={10}>10</option>
-                                        <option value={25}>25</option>
-                                        <option value={50}>50</option>
-                                        <option value={100}>100</option>
-                                    </select>
+                                        <div className="flex items-center justify-between space-x-1">
+                                            <div>
+                                                {viewMode === 'month' ? 'View All' : 'By Month'}
+                                            </div>
+                                            <div>
+                                                <MdCreditScore className="text-xl"/>
+                                            </div>
+                                        </div>
+                                    </button>
                                 </div>
                             </div>
 

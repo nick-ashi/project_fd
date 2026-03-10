@@ -18,7 +18,7 @@ import api from '../../api/axios';
  *  [ ] Ability to either create a budget based on one lump sum OR sum of category budgets
  *  [ ] Ability to COPY budgets from the previous month
  */
-export default function BudgetCard({ transactions }) {
+export default function BudgetCard({transactions, viewingMonth, viewingYear, onMonthChange}) {
     const [budget, setBudget] = useState(null);
     const [budgetType, setBudgetType] = useState('GENERAL');
     const [isEditing, setIsEditing] = useState(false);
@@ -50,9 +50,9 @@ export default function BudgetCard({ transactions }) {
     const actualCurrentMonth = currentDate.getMonth() + 1; // 0-indexed, so add 1
     const actualCurrentYear = currentDate.getFullYear();
 
-    // Viewing months
-    const [viewingMonth, setViewingMonth] = useState(actualCurrentMonth);
-    const [viewingYear, setViewingYear] = useState(actualCurrentYear);
+    // // Viewing months TAKEN OUT FOR REPLACEMENT WITH PROPS
+    // const [viewingMonth, setViewingMonth] = useState(actualCurrentMonth);
+    // const [viewingYear, setViewingYear] = useState(actualCurrentYear);
 
     const isViewingCurrentMonth = viewingMonth === actualCurrentMonth && viewingYear === actualCurrentYear;
 
@@ -170,27 +170,24 @@ export default function BudgetCard({ transactions }) {
     // Navigate to previous month
     const handlePreviousMonth = () => {
         if (viewingMonth === 1) {
-            setViewingMonth(12);
-            setViewingYear(viewingYear - 1);
+            onMonthChange(12, viewingYear - 1);
         } else {
-            setViewingMonth(viewingMonth - 1);
+            onMonthChange(viewingMonth - 1, viewingYear);
         }
     };
 
     // Navigate to next month
     const handleNextMonth = () => {
         if (viewingMonth === 12) {
-            setViewingMonth(1);
-            setViewingYear(viewingYear + 1);
+            onMonthChange(1, viewingYear + 1);
         } else {
-            setViewingMonth(viewingMonth + 1);
+            onMonthChange(viewingMonth + 1, viewingYear);
         }
     };
 
     // Jump back to current month
     const handleGoToCurrentMonth = () => {
-        setViewingMonth(actualCurrentMonth);
-        setViewingYear(actualCurrentYear);
+        onMonthChange(actualCurrentMonth, actualCurrentYear);
     };
 
     // Category budget saves
